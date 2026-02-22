@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quay Số May Mắn - Phương Án Tối Ưu</title>
+    <title>Quay Số May Mắn 2026</title>
     <style>
         :root { --gold: #ffea00; --red: #d40000; --dark-red: #8b0000; }
-        
         body {
             margin: 0; padding: 0;
             font-family: 'Arial', sans-serif;
@@ -103,7 +102,7 @@
 
     <button class="btn-all" onclick="spinAll()">QUAY TẤT CẢ</button>
 
-    <div id="result-overlay" onclick="this.style.display='none'">
+    <div id="result-overlay" onclick="closeOverlay()">
         <div>
             <h1 id="result-text" style="color: var(--gold); font-size: 4rem;"></h1>
             <p style="color: white;">(Nhấn vào màn hình để tiếp tục)</p>
@@ -118,7 +117,8 @@
             results: [], 
             buffer: "", 
             exclude: [],
-            isSpinning: false 
+            isSpinning: false,
+            currentResultNumbers: [] 
         };
 
         function createNanInputs() {
@@ -132,7 +132,6 @@
         }
         window.onload = createNanInputs;
 
-        // Xử lý điều khiển ngầm (Phương án 2 tích hợp sẵn)
         window.addEventListener('keydown', (e) => {
             if (e.key >= '0' && e.key <= '9') {
                 config.buffer += e.key;
@@ -153,6 +152,7 @@
             
             config.rotations = new Array(config.wheels).fill(0);
             config.results = new Array(config.wheels).fill(null);
+            config.currentResultNumbers = [];
 
             const ui = document.getElementById('main-ui');
             ui.innerHTML = '';
@@ -199,18 +199,13 @@
             }
         }
 
-        // QUAN TRỌNG: Phương án 1 - Tính toán số sạch trước khi xoay
         function getSafeNumbers() {
-            // Ưu tiên mã hack nếu có gõ ngầm
             if (config.buffer.length === config.wheels) {
                 return config.buffer.split('').map(Number);
             }
-
             let finalSet = [];
             let isSafe = false;
             let attempts = 0;
-
-            // Vòng lặp tìm số ngẫu nhiên không nằm trong danh sách loại trừ
             while (!isSafe && attempts < 1000) {
                 finalSet = [];
                 for (let i = 0; i < config.wheels; i++) {
@@ -225,14 +220,19 @@
 
         function startSpinning(targetIdx = null) {
             if(config.isSpinning) return;
-            config.isSpinning = true;
-
-            const finalDigits = getSafeNumbers();
             
+            // Chỉ chốt số mục tiêu khi bắt đầu một lượt quay mới (buffer rỗng hoặc bắt đầu quay tất cả)
+            if (config.currentResultNumbers.length === 0) {
+                config.currentResultNumbers = getSafeNumbers();
+            }
+
             if (targetIdx !== null) {
-                executeRotation(targetIdx, finalDigits[targetIdx]);
+                // Quay một vòng đơn lẻ
+                executeRotation(targetIdx, config.currentResultNumbers[targetIdx]);
             } else {
-                finalDigits.forEach((digit, i) => {
+                // Quay tất cả các vòng
+                config.isSpinning = true;
+                config.currentResultNumbers.forEach((digit, i) => {
                     executeRotation(i, digit);
                 });
             }
@@ -243,28 +243,38 @@
             const arcDeg = 360 / nan;
             const stopAt = 270 - (target * arcDeg) - (arcDeg / 2);
             
-            config.rotations[i] += (360 * 10) + (stopAt - (config.rotations[i] % 360));
+            // Tăng số vòng quay để mượt hơn
+            config.rotations[i] += (360 * (10 + i)) + (stopAt - (config.rotations[i] % 360));
             
             const canvasEl = document.getElementById(`cv-${i}`);
             canvasEl.style.transform = `rotate(${config.rotations[i]}deg)`;
             
             config.results[i] = target;
-            setTimeout(() => checkWinner(), 4600);
+            
+            // Đợi vòng quay cuối cùng (thường là đơn vị) xong mới hiện giải
+            setTimeout(() => checkWinner(), 5000);
         }
 
         function spinAll() { startSpinning(); }
 
         function checkWinner() {
+            // Kiểm tra xem tất cả các vòng đã có giá trị (không còn null)
             if (!config.results.includes(null)) {
                 const finalNum = config.results.join('');
                 const prize = document.getElementById('current-prize').value;
                 document.getElementById('result-text').innerHTML = `CHÚC MỪNG SỐ <br><span style="font-size: 9rem;">${finalNum}</span><br> ĐÃ ĐẠT ${prize.toUpperCase()}`;
                 document.getElementById('result-overlay').style.display = 'flex';
                 
+                // Quan trọng: Phải reset trạng thái ở đây
                 config.isSpinning = false;
-                config.buffer = ""; // Xóa hack
-                config.results = new Array(config.wheels).fill(null); // Reset kết quả tạm
             }
+        }
+
+        function closeOverlay() {
+            document.getElementById('result-overlay').style.display = 'none';
+            config.buffer = ""; // Xóa hack sau lượt thắng
+            config.results = new Array(config.wheels).fill(null); // Reset kết quả để quay lượt mới
+            config.currentResultNumbers = []; // Reset bộ số mục tiêu
         }
     </script>
 </body>
