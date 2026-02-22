@@ -3,58 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quay Số May Mắn Đầu Năm</title>
+    <title>Quay Số May Mắn - Phương Án Tối Ưu</title>
     <style>
         :root { --gold: #ffea00; --red: #d40000; --dark-red: #8b0000; }
         
         body {
             margin: 0; padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
             background: url('hinh-nen.png') no-repeat center center fixed;
             background-size: cover;
             height: 100vh; display: flex; flex-direction: column; align-items: center;
             color: white; overflow: hidden;
         }
 
-        /* Tiêu đề có hiệu ứng rực rỡ */
         .header-title {
-            font-size: 3.2rem; color: var(--gold); font-weight: bold;
+            font-size: 3rem; color: var(--gold); font-weight: bold;
             margin-top: 20px; text-transform: uppercase;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.8), 0 0 20px var(--gold);
-            animation: glow 1.5s ease-in-out infinite alternate;
+            text-shadow: 2px 2px 10px #000, 0 0 20px var(--gold);
+            animation: luckyGlow 1.5s infinite alternate;
         }
 
-        @keyframes glow {
-            from { text-shadow: 0 0 10px var(--gold); transform: scale(1); }
-            to { text-shadow: 0 0 30px #fff; transform: scale(1.02); }
-        }
+        @keyframes luckyGlow { from { transform: scale(1); } to { transform: scale(1.03); } }
 
-        /* Bảng thiết lập ban đầu */
         #setup-panel {
-            background: rgba(0, 0, 0, 0.85); padding: 20px; border-radius: 15px;
-            margin-top: 15px; z-index: 100; border: 2px solid var(--gold);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.9); padding: 20px; border-radius: 15px;
+            margin-top: 10px; z-index: 100; border: 2px solid var(--gold);
         }
-
-        .setup-row { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 10px; }
 
         .wheels-wrapper { display: flex; gap: 40px; margin-top: 30px; }
-        
         .wheel-container { display: flex; flex-direction: column; align-items: center; position: relative; }
 
         .label-box {
-            background: #000; color: #fff; padding: 6px 15px;
-            border-radius: 20px; font-weight: bold; margin-bottom: 12px;
+            background: #000; color: #fff; padding: 5px 15px;
+            border-radius: 20px; font-weight: bold; margin-bottom: 10px;
             border: 1px solid var(--gold); font-size: 0.9rem;
         }
 
         .canvas-container {
-            position: relative; width: 240px; height: 240px;
-            border: 6px solid var(--gold); border-radius: 50%;
-            background: #fff; box-shadow: 0 0 25px rgba(0,0,0,0.6);
+            position: relative; width: 220px; height: 220px;
+            border: 5px solid var(--gold); border-radius: 50%;
+            background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* Kim chỉ ở đỉnh */
         .pointer {
             position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 15px solid transparent;
@@ -63,25 +53,19 @@
 
         canvas { width: 100%; height: 100%; transition: transform 4.5s cubic-bezier(0.1, 0, 0.2, 1); }
 
-        button {
-            cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s;
-        }
+        button { cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
 
         .btn-quay {
-            margin-top: 15px; padding: 10px 25px;
-            background: transparent; color: white; border: 2px solid var(--gold);
-            border-radius: 5px;
+            margin-top: 15px; padding: 8px 20px;
+            background: transparent; color: white; border: 2px solid var(--gold); border-radius: 5px;
         }
-        .btn-quay:hover { background: var(--gold); color: black; }
 
         .btn-all {
-            margin-top: 40px; padding: 18px 70px; font-size: 2rem;
+            margin-top: 40px; padding: 15px 60px; font-size: 1.8rem;
             border-radius: 50px; background: var(--red); color: var(--gold);
-            border: 5px solid var(--gold); box-shadow: 0 0 30px var(--red);
+            border: 4px solid var(--gold); box-shadow: 0 0 30px var(--red);
         }
-        .btn-all:hover { transform: scale(1.05); background: #ff0000; }
 
-        /* Popup kết quả */
         #result-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); justify-content: center; align-items: center;
@@ -94,21 +78,20 @@
     <div class="header-title">QUAY SỐ MAY MẮN ĐẦU NĂM</div>
 
     <div id="setup-panel">
-        <div class="setup-row">
+        <div style="margin-bottom:10px;">
             Số vòng: 
             <select id="num-wheels" onchange="createNanInputs()">
-                <option value="2">2 Vòng (Chục, Đơn vị)</option>
-                <option value="3">3 Vòng (Trăm, Chục, Đơn vị)</option>
+                <option value="2">2 Vòng</option>
+                <option value="3">3 Vòng</option>
             </select>
-            Loại trừ (vd: 44,78): <input type="text" id="exclude-nums" style="width: 100px;">
+            Loại trừ: <input type="text" id="exclude-nums" placeholder="44,78" style="width: 100px;">
         </div>
-        <div id="nan-inputs-container" class="setup-row">
-            </div>
-        <button onclick="initApp()" style="width: 100%; background: #28a745; color: white; border: none; padding: 10px; border-radius: 5px;">XÁC NHẬN & BẮT ĐẦU</button>
+        <div id="nan-inputs" style="margin-bottom:10px;"></div>
+        <button onclick="initApp()" style="width: 100%; background: #28a745; color: white; border: none; padding: 8px; border-radius: 5px;">BẮT ĐẦU CHƯƠNG TRÌNH</button>
     </div>
 
     <div style="margin-top: 20px;">
-        <select id="current-prize" style="font-size: 1.4rem; padding: 8px 30px; border-radius: 10px; font-weight: bold; color: var(--dark-red);">
+        <select id="current-prize" style="font-size: 1.2rem; padding: 5px 20px; border-radius: 5px; font-weight: bold; color: var(--dark-red);">
             <option value="Giải Nhất">Giải Nhất</option>
             <option value="Giải Nhì">Giải Nhì</option>
             <option value="Giải Ba">Giải Ba</option>
@@ -122,8 +105,8 @@
 
     <div id="result-overlay" onclick="this.style.display='none'">
         <div>
-            <h1 id="result-text" style="color: var(--gold); font-size: 4rem; line-height: 1.2;"></h1>
-            <p style="color: white; font-size: 1.2rem; margin-top: 20px;">(Nhấn vào màn hình để quay lượt mới)</p>
+            <h1 id="result-text" style="color: var(--gold); font-size: 4rem;"></h1>
+            <p style="color: white;">(Nhấn vào màn hình để tiếp tục)</p>
         </div>
     </div>
 
@@ -133,38 +116,31 @@
             nans: [], 
             rotations: [], 
             results: [], 
-            buffer: "", // Lưu trữ "mã hack" gõ ngầm
-            exclude: [] 
+            buffer: "", 
+            exclude: [],
+            isSpinning: false 
         };
 
-        // Khởi tạo ô nhập số nan khi thay đổi số vòng
         function createNanInputs() {
             const count = parseInt(document.getElementById('num-wheels').value);
-            const container = document.getElementById('nan-inputs-container');
+            const container = document.getElementById('nan-inputs');
             container.innerHTML = 'Số nan: ';
             const labels = count === 3 ? ['Trăm', 'Chục', 'Đơn vị'] : ['Chục', 'Đơn vị'];
             labels.forEach((l, i) => {
-                container.innerHTML += `${l}: <input type="number" id="nVal-${i}" value="10" min="2" style="width:35px;"> `;
+                container.innerHTML += `${l}: <input type="number" id="nVal-${i}" value="10" style="width:35px;"> `;
             });
         }
         window.onload = createNanInputs;
 
-        // Xử lý điều khiển ngầm qua bàn phím
+        // Xử lý điều khiển ngầm (Phương án 2 tích hợp sẵn)
         window.addEventListener('keydown', (e) => {
-            // Nhận diện phím số từ 0-9
             if (e.key >= '0' && e.key <= '9') {
                 config.buffer += e.key;
                 if (config.buffer.length > config.wheels) config.buffer = config.buffer.slice(-config.wheels);
-                console.log("Tín hiệu ngầm:", config.buffer);
             }
-            // Right Alt để xóa lệnh hack nếu gõ nhầm
-            if (e.code === 'AltRight' || e.key === 'AltGraph') {
-                config.buffer = "";
-                console.log("Đã xóa lệnh hack");
-            }
+            if (e.code === 'AltRight' || e.key === 'AltGraph') config.buffer = "";
         });
 
-        // Bắt đầu ứng dụng sau khi thiết lập
         function initApp() {
             config.wheels = parseInt(document.getElementById('num-wheels').value);
             const rawExclude = document.getElementById('exclude-nums').value;
@@ -194,67 +170,64 @@
                     </div>`;
             });
 
-            // Vẽ vòng quay lên Canvas
-            setTimeout(() => {
-                for(let i=0; i<config.wheels; i++) drawWheel(i);
-            }, 100);
-            
+            setTimeout(() => { for(let i=0; i<config.wheels; i++) drawWheel(i); }, 100);
             document.getElementById('setup-panel').style.display = 'none';
         }
 
         function drawWheel(idx) {
             const cv = document.getElementById(`cv-${idx}`);
-            if(!cv) return;
             const ctx = cv.getContext('2d');
-            const numSegments = config.nans[idx];
+            const num = config.nans[idx];
             const radius = cv.width / 2;
-            const arc = (Math.PI * 2) / numSegments;
+            const arc = (Math.PI * 2) / num;
 
             ctx.clearRect(0,0,cv.width, cv.height);
-            for(let i=0; i<numSegments; i++) {
+            for(let i=0; i<num; i++) {
                 ctx.beginPath();
                 ctx.fillStyle = i % 2 === 0 ? "#d40000" : "#ffea00";
                 ctx.moveTo(radius, radius);
                 ctx.arc(radius, radius, radius, i * arc, (i + 1) * arc);
                 ctx.fill();
-                
-                // Vẽ số trên nan
                 ctx.save();
                 ctx.translate(radius, radius);
                 ctx.rotate(i * arc + arc / 2);
                 ctx.fillStyle = i % 2 === 0 ? "white" : "black";
-                ctx.font = "bold 35px Arial";
+                ctx.font = "bold 40px Arial";
                 ctx.textAlign = "right";
                 ctx.fillText(i, radius - 20, 15);
                 ctx.restore();
             }
         }
 
-        // Quyết định số cuối cùng (Hack hoặc Random né số loại trừ)
-        function getValidatedNumbers() {
+        // QUAN TRỌNG: Phương án 1 - Tính toán số sạch trước khi xoay
+        function getSafeNumbers() {
+            // Ưu tiên mã hack nếu có gõ ngầm
             if (config.buffer.length === config.wheels) {
                 return config.buffer.split('').map(Number);
             }
 
-            let isSafe = false;
             let finalSet = [];
-            let attempt = 0;
+            let isSafe = false;
+            let attempts = 0;
 
-            while (!isSafe && attempt < 500) {
+            // Vòng lặp tìm số ngẫu nhiên không nằm trong danh sách loại trừ
+            while (!isSafe && attempts < 1000) {
                 finalSet = [];
                 for (let i = 0; i < config.wheels; i++) {
                     finalSet.push(Math.floor(Math.random() * config.nans[i]));
                 }
-                const resultStr = finalSet.join('');
-                if (!config.exclude.includes(resultStr)) isSafe = true;
-                attempt++;
+                const resStr = finalSet.join('');
+                if (!config.exclude.includes(resStr)) isSafe = true;
+                attempts++;
             }
             return finalSet;
         }
 
-        // Thực hiện quay
         function startSpinning(targetIdx = null) {
-            const finalDigits = getValidatedNumbers();
+            if(config.isSpinning) return;
+            config.isSpinning = true;
+
+            const finalDigits = getSafeNumbers();
             
             if (targetIdx !== null) {
                 executeRotation(targetIdx, finalDigits[targetIdx]);
@@ -268,35 +241,29 @@
         function executeRotation(i, target) {
             const nan = config.nans[i];
             const arcDeg = 360 / nan;
-            // Tính toán để số target dừng đúng ở kim chỉ (270 độ)
             const stopAt = 270 - (target * arcDeg) - (arcDeg / 2);
             
-            // Xoay tối thiểu 8 vòng để tạo hiệu ứng
-            config.rotations[i] += (360 * 8) + (stopAt - (config.rotations[i] % 360));
+            config.rotations[i] += (360 * 10) + (stopAt - (config.rotations[i] % 360));
             
             const canvasEl = document.getElementById(`cv-${i}`);
             canvasEl.style.transform = `rotate(${config.rotations[i]}deg)`;
             
             config.results[i] = target;
-            setTimeout(() => checkAndShowResult(), 4600);
+            setTimeout(() => checkWinner(), 4600);
         }
 
-        function spinAll() {
-            startSpinning();
-        }
+        function spinAll() { startSpinning(); }
 
-        function checkAndShowResult() {
-            // Kiểm tra xem tất cả các vòng đã dừng chưa (không còn giá trị null)
+        function checkWinner() {
             if (!config.results.includes(null)) {
                 const finalNum = config.results.join('');
                 const prize = document.getElementById('current-prize').value;
-                
-                document.getElementById('result-text').innerHTML = `CHÚC MỪNG SỐ <br><span style="font-size: 10rem; text-shadow: 0 0 30px #fff;">${finalNum}</span><br> ĐÃ ĐẠT ${prize.toUpperCase()}`;
+                document.getElementById('result-text').innerHTML = `CHÚC MỪNG SỐ <br><span style="font-size: 9rem;">${finalNum}</span><br> ĐÃ ĐẠT ${prize.toUpperCase()}`;
                 document.getElementById('result-overlay').style.display = 'flex';
                 
-                // Reset trạng thái để lượt quay sau là random ngẫu nhiên
-                config.buffer = ""; 
-                config.results = new Array(config.wheels).fill(null);
+                config.isSpinning = false;
+                config.buffer = ""; // Xóa hack
+                config.results = new Array(config.wheels).fill(null); // Reset kết quả tạm
             }
         }
     </script>
